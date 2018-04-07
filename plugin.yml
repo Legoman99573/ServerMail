@@ -21,10 +21,13 @@ commands:
         permission: servermail.mail
         permissionMessage: You need the right permission to use this command
         usage: <command>
+    replymail:
+        description: Reply to a mail. Used from book meassage
+        permission: servermail.mail
+        permissionMessage: You need the right permission to use this command
+        usage: <command>
 
 permissions:
-    servermail.mail:
-        description: Allows a player access to /mail
     servermail.mail:
         description: Allows a player access to /mail
     servermail.disable:

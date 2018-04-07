@@ -32,7 +32,6 @@ public class ChatEvents implements Listener{
             Mail mail = new Mail(event.getPlayer(), sm);
             mail.sendMail(sm.sendMessageMap.get(event.getPlayer()), ChatColor.translateAlternateColorCodes('&',message));
             event.setCancelled(true);
-            event.getPlayer().sendMessage(ChatColor.GREEN+"Mail sent");
             MailMenu mailMenu = new MailMenu(sm);
             mailMenu.openInventory(event.getPlayer(),1, sm.mailSort.get(event.getPlayer()));
         }

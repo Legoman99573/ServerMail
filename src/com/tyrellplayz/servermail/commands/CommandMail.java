@@ -19,10 +19,6 @@ public class CommandMail implements CommandExecutor{
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] strings) {
         if(command.getName().equalsIgnoreCase("mail")){
-            if(strings.length==1){
-                Mail mail = new Mail(sm);
-                mail.sendMailDebug(Bukkit.getOfflinePlayer("TyrellPlayz"), "Hello there, this is a message for you to enjoy");
-            }
             if(!sender.hasPermission(command.getPermission())){
                 sender.sendMessage(ChatColor.RED+command.getPermissionMessage());
                 return true;

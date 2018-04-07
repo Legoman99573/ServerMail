@@ -2,6 +2,7 @@ package com.tyrellplayz.servermail;
 
 import com.tyrellplayz.servermail.commands.CommandDeleteMail;
 import com.tyrellplayz.servermail.commands.CommandMail;
+import com.tyrellplayz.servermail.commands.CommandReplyMail;
 import com.tyrellplayz.servermail.configs.MainConfig;
 import com.tyrellplayz.servermail.configs.StorageConfig;
 import com.tyrellplayz.servermail.events.ChatEvents;
@@ -92,6 +93,7 @@ public class ServerMail extends JavaPlugin implements IPlugin{
         getCommand("mail").setExecutor(new CommandMail(this));
         getCommand("maildisable").setExecutor(new CommandMail(this));
         getCommand("deletemail").setExecutor(new CommandDeleteMail(this));
+        getCommand("replymail").setExecutor(new CommandReplyMail());
     }
 
     @Override
@@ -117,7 +119,7 @@ public class ServerMail extends JavaPlugin implements IPlugin{
         }catch (ArrayIndexOutOfBoundsException whatVersionAreYouUsingException){
             return false;
         }
-        Log.info("Your server is running version " + version);
+        //Log.info("Your server is running version " + version);
         if(version.equals("v1_12_R1")){
             //server is running 1.12.* so we need to use the 1.12 R1 NMSUtils class
             nmsUtils = new NMSUtils_1_12_R1();

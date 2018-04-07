@@ -1,5 +1,6 @@
 package com.tyrellplayz.servermail;
 
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -25,8 +26,14 @@ public class Mail implements IMail{
     @Override
     public boolean sendMail(Player receiver, String message) {
         if(receiver==null)return false;
-        if(message.equalsIgnoreCase(""))return false;
-        if(sm.hasMailDisabled(receiver.getUniqueId()))return false;
+        if(message.equalsIgnoreCase("")) {
+            sender.sendMessage(ChatColor.RED+"You cant send nothing");
+            return false;
+        }
+        if(sm.hasMailDisabled(receiver.getUniqueId())) {
+            sender.sendMessage(ChatColor.RED+"Player has disabled mail");
+            return false;
+        }
         if(sm.messagesMap.containsKey(receiver.getUniqueId())){
             sm.messagesMap.get(receiver.getUniqueId()).addMessage(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
         }else{
@@ -41,8 +48,14 @@ public class Mail implements IMail{
     @Override
     public boolean sendMail(OfflinePlayer receiver, String message) {
         if(receiver==null)return false;
-        if(message.equalsIgnoreCase(""))return false;
-        if(sm.hasMailDisabled(receiver.getUniqueId()))return false;
+        if(message.equalsIgnoreCase("")) {
+            sender.sendMessage(ChatColor.RED+"You cant send nothing");
+            return false;
+        }
+        if(sm.hasMailDisabled(receiver.getUniqueId())) {
+            sender.sendMessage(ChatColor.RED+"Player has disabled mail");
+            return false;
+        }
         if(sm.messagesMap.containsKey(receiver.getUniqueId())){
             sm.messagesMap.get(receiver.getUniqueId()).addMessage(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
         }else{
@@ -57,8 +70,14 @@ public class Mail implements IMail{
     @Override
     public boolean sendMail(UUID receiver, String message) {
         if(receiver==null)return false;
-        if(message.equalsIgnoreCase(""))return false;
-        if(sm.hasMailDisabled(receiver))return false;
+        if(message.equalsIgnoreCase("")) {
+            sender.sendMessage(ChatColor.RED+"You cant send nothing");
+            return false;
+        }
+        if(sm.hasMailDisabled(receiver)) {
+            sender.sendMessage(ChatColor.RED+"Player has disabled mail");
+            return false;
+        }
         if(sm.messagesMap.containsKey(receiver)){
             sm.messagesMap.get(receiver).addMessage(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
         }else{
