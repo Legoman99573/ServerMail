@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="spigot-1.10.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Minecarft Server/spigot-1.10.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Minecarft Server/spigot-1.11.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Minecarft Server/spigot-1.11.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../Minecarft Server/spigot-1.10.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Minecarft Server/spigot-1.11.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../Minecarft Server/spigot-1.11.jar!/" />
+    </SOURCES>
+  </library>
+</component>

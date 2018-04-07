@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ServerMail">
+    <output-path>$PROJECT_DIR$/../../Minecarft Server/plugins</output-path>
+    <root id="archive" name="ServerMail.jar">
+      <element id="module-output" name="ServerMail" />
+      <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/config.yml" />
+    </root>
+  </artifact>
+</component>
