@@ -1,0 +1,86 @@
+# -===============-
+# -=  ServerMail =-
+# -=   <0.2.4>   =-
+# -===============-
+
+# This file will allow you to change the text in the menus and the book/sign
+# if your server is not an english one. Please place all text in '' like below.
+# You can't change numbers sorry as the pages work with these numbers.
+
+# Mail Menu
+mailMenuTitle: 'Your Inbox : Page'
+
+readMessageText: 'Read - Click to view'
+unReadMessageText: 'UnRead - Click to view'
+
+informationText: 'Information'
+totalMailText: 'Total mail'
+
+sendMailText: 'Send mail'
+sendMailLoadText: 'Can take a while to load menu'
+
+previousPageText: 'Previous page'
+nextPageText: 'Next page'
+
+sortNext: 'Sort'
+sortLatestMessagesText: 'Latest messages first'
+sortOldMessagesText: 'Old messages first'
+sortClickText: 'Click to change'
+
+exitText: 'Exit'
+
+# Player menu
+playerMenuTitle: 'Pick player : Page'
+
+playerHeadLoreText: 'Send mail'
+enterNameText: 'Enter a name'
+
+backText: 'Back'
+
+# Chat Messages
+# Do not put in the cancel word at the end, The plugin will do it itself from cancelText
+typeMessageText: 'Type message in chat. To cancel type'
+typeItemText: 'Hold item/block in hand then type in your message. To cancel type'
+typeMoneyText: 'Enter in amount to send. To cancel type'
+notEnoughMoney: 'You don''t have enough money'
+typeMoneyMessageText: 'Type in message to be sent with the money. To cancel type'
+mustBeNumberText: 'Must be a number!'
+newMailText: 'You have new mail'
+
+# What the player types in the chat to cancel
+cancelText: 'cancel'
+
+
+cantSendNothingText: 'You cant send nothing'
+unableToFindPlayerText: 'Was unable to find player'
+playerNeverOnline: 'Player has never been online before'
+
+playerDisabledMailText: 'Player has disabled mail'
+mailSentText: 'Mail sent'
+
+# Input Sign
+nameText: 'Enter name'
+
+# Book Text
+sentByText: 'Sent by'
+deleteText: 'Delete'
+replyText: 'Reply'
+receiveText: 'Receive package'
+
+# Commands
+canceledText: 'Canceled'
+mustBePlayerText: 'You must be a player'
+permissionMessage: 'You don''t have access to this command'
+messageDeletedText: 'Message deleted'
+openingMailText: 'Opening mail...'
+disableMailText: 'You will no longer receive mail from other players'
+enableMailText: 'You can now receive mail from other players'
+itemReceivedText: 'Items/blocks received'
+moneyReceivedText: 'received'
+nothingToReceive: 'Nothing to receive'
+
+# Mail send menu
+mailSendMenuTitle: 'Choose mail type'
+sendMessageMessage: 'Send message'
+sendItemMessage: 'Send a item/block package'
+sendMoneyMessage: 'Send a money package'

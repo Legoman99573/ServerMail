@@ -1,10 +1,8 @@
 package com.tyrellplayz.servermail.menus;
 
-import com.tyrellplayz.servermail.Messages;
 import com.tyrellplayz.servermail.ServerMail;
-import com.tyrellplayz.servermail.utils.Utils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import com.tyrellplayz.servermail.configs.LanguageConfig;
+import com.tyrellplayz.servermail.configs.MainConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,14 +14,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class PlayerMenu extends CustomInventory implements Listener{
 
-    private static String title = "Pick player : Page ";
+    public static String title = "Pick player : Page ";
     private int rows = 6;
 
     private static Inventory inv;
@@ -37,7 +35,6 @@ public class PlayerMenu extends CustomInventory implements Listener{
         inv = Bukkit.createInventory(null,getSize(rows),title+page);
         inv.setMaxStackSize(1);
 
-        List<OfflinePlayer> playerList = Arrays.asList(Bukkit.getServer().getOfflinePlayers());
         /*
         Players
          */
@@ -45,9 +42,10 @@ public class PlayerMenu extends CustomInventory implements Listener{
         int last = 45*page;
         int i = 1;
         int slot = 0;
-        for(OfflinePlayer offlinePlayer:playerList){
+        List<OfflinePlayer> players = ServerMail.offlinePlayers;
+        for(OfflinePlayer offlinePlayer:players){
             if((i>=first)&&(i<=last)){
-                createHeadDisplay(inv, offlinePlayer,slot, "Send mail");
+                createHeadDisplay(inv, offlinePlayer,slot, LanguageConfig.getPlayerHeadLoreText());
                 slot++;
             }
             i++;
@@ -55,15 +53,15 @@ public class PlayerMenu extends CustomInventory implements Listener{
         /*
         The Task Bar
          */
-        createDisplay(inv, Material.SIGN, 45,ChatColor.GOLD+"Enter a name", ChatColor.RED+"Coming soon");
-        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 46, "", (byte)7);
-        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 47, "", (byte)7);
-        createDisplay(inv, Material.PAPER, 48,ChatColor.GOLD+"Previous page");
-        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 49, "", (byte)7);
-        createDisplay(inv, Material.PAPER, 50, ChatColor.GOLD+"Next page");
-        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 51, "", (byte)7);
-        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 52, "", (byte)7);
-        createDisplay(inv, Material.BARRIER, 53, ChatColor.RED+"Back");
+        //createDisplay(inv, Material.SIGN, 45,ChatColor.GOLD+LanguageConfig.getNameText());
+        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 46, "", MainConfig.getPaneColour());
+        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 47, "", MainConfig.getPaneColour());
+        createDisplay(inv, Material.PAPER, 48,ChatColor.GOLD+LanguageConfig.getPreviousPageText());
+        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 49, "", MainConfig.getPaneColour());
+        createDisplay(inv, Material.PAPER, 50, ChatColor.GOLD+LanguageConfig.getNextPageText());
+        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 51, "", MainConfig.getPaneColour());
+        createDisplayColour(inv, Material.STAINED_GLASS_PANE, 52, "", MainConfig.getPaneColour());
+        createDisplay(inv, Material.BARRIER, 53, ChatColor.RED+LanguageConfig.getBackText());
 
         player.openInventory(inv);
     }
@@ -74,46 +72,56 @@ public class PlayerMenu extends CustomInventory implements Listener{
         ItemStack clicked = event.getCurrentItem();
         Inventory inventory = event.getInventory();
         if(inventory.getName().contains(title)){
+            int maxPages;
+            maxPages = (int)Math.ceil(ServerMail.offlinePlayers.size()/45.0);
             // Stops a player from taking items out
             event.setCancelled(true);
             // Checks if anything as clicked
             if(clicked == null)return;
             // Handles clicked player
             if(clicked.getType() == Material.SKULL_ITEM || clicked.getType() == Material.SKULL){
-                Log.info("Started mail");
-                // Opens book to send message to clicked player
                 OfflinePlayer receiver = Bukkit.getServer().getOfflinePlayer(clicked.getItemMeta().getDisplayName());
-                sm.sendMessageMap.put(player, receiver);
-                player.closeInventory();
-                player.sendMessage(ChatColor.GREEN+"Type message in chat. To cancel type 'cancel'");
+                MailSendMenu mailSendMenu = new MailSendMenu(sm);
+                mailSendMenu.openInventory(player,receiver);
             }
             // Goes back to mail menu
             if(clicked.getType() == Material.BARRIER){
                 MailMenu mailMenu = new MailMenu(sm);
                 mailMenu.openInventory(player, 1, sm.mailSort.get(player));
             }
-            // Handles going to a Previous Page
-            if(clicked.getType().getData().getName().equalsIgnoreCase("Previous page")){
-                int pPage =  Integer.parseInt(inventory.getName()) - 1;
-                if(pPage < 1){
-                    return;
-                }
-                // Open the menu again for the Previous Page
-                PlayerMenu playerMenu = new PlayerMenu(sm);
-                playerMenu.openInventory(player, pPage);
+            // Handles entering a player name
+            if(clicked.getType() == Material.SIGN){
+                sm.signMenu.open(player, new String[]{LanguageConfig.getEnterNameText(), "==========", "", "=========="}, (player1, text) -> {
+                    OfflinePlayer receiver = Bukkit.getServer().getOfflinePlayer(text[2]);
+                    MailSendMenu mailSendMenu = new MailSendMenu(sm);
+                    mailSendMenu.openInventory(player,receiver);
+                });
             }
-            // Handles going to the Next Page
-            if(clicked.getType().getData().getName().equalsIgnoreCase("Next page")){
-                List<OfflinePlayer> playerList = Arrays.asList(Bukkit.getServer().getOfflinePlayers());
-                int nPage =  Integer.parseInt(inventory.getName()) + 1;
-                int playerSize = playerList.size();
-                if(nPage > playerSize/45){
-                    return;
+            if(clicked.getType() == Material.PAPER){
+                // Handles going to a Previous Page
+                if(clicked.getItemMeta().getDisplayName().contains(LanguageConfig.getPreviousPageText())){
+                    String str = inventory.getName().replaceAll("\\D+","");
+                    int pPage =  Integer.parseInt(str) - 1;
+                    if(pPage < 1){
+                        return;
+                    }
+                    // Open the menu again for the Previous Page
+                    PlayerMenu playerMenu = new PlayerMenu(sm);
+                    playerMenu.openInventory(player, pPage);
                 }
-                // Open the menu again for the Next Page
-                PlayerMenu playerMenu = new PlayerMenu(sm);
-                playerMenu.openInventory(player, nPage);
+                // Handles going to the Next Page
+                if(clicked.getItemMeta().getDisplayName().contains(LanguageConfig.getNextPageText())){
+                    String str = inventory.getName().replaceAll("\\D+","");
+                    int nPage =  Integer.parseInt(str) + 1;
+                    if(nPage > maxPages){
+                        return;
+                    }
+                    // Open the menu again for the Next Page
+                    PlayerMenu playerMenu = new PlayerMenu(sm);
+                    playerMenu.openInventory(player, nPage);
+                }
             }
+
         }
 
     }

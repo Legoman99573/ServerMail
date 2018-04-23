@@ -1,8 +1,8 @@
 package com.tyrellplayz.servermail.menus;
 
 public enum EnumSort {
-    LATEST(0, "Latest messages"),
-    OLD(1, "Old messages");
+    LATEST(0, "Latest messages first"),
+    OLD(1, "Old messages first");
 
     private int sortNumber;
     private String sortName;

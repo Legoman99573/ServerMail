@@ -1,12 +1,10 @@
 package com.tyrellplayz.servermail.nms;
 
+import com.tyrellplayz.servermail.Mail;
 import com.tyrellplayz.servermail.ServerMail;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
+import com.tyrellplayz.servermail.configs.LanguageConfig;
 import net.minecraft.server.v1_11_R1.IChatBaseComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftMetaBook;
 import org.bukkit.entity.Player;
@@ -23,13 +21,14 @@ public class NMSUtils_1_11_R1 implements NMSUtils{
         BookMeta bookMeta = (BookMeta) Bukkit.getItemFactory().getItemMeta(Material.WRITTEN_BOOK);
         bookMeta.setTitle(title);
         bookMeta.setAuthor(sender);
-
-        int messageIndex = 0;
-        for(String message1:sm.messagesMap.get(player.getUniqueId()).getMessages()){
-            if(message1.contains(message)){
-                messageIndex = sm.messagesMap.get(player.getUniqueId()).getMessages().indexOf(message1);
+        int mailIndex = 0;
+        Mail mail;
+        for(Mail m:sm.playerMailMap.get(player.getUniqueId()).getMailList()){
+            if(m.getMessage().contains(message)){
+                mailIndex = sm.playerMailMap.get(player.getUniqueId()).getMailList().indexOf(m);
             }
         }
+        mail = sm.playerMailMap.get(player.getUniqueId()).getMailList().get(mailIndex);
         List<IChatBaseComponent> pages;
         try{
             pages = (List<IChatBaseComponent>) CraftMetaBook.class.getDeclaredField("pages").get(bookMeta);
@@ -38,7 +37,15 @@ public class NMSUtils_1_11_R1 implements NMSUtils{
             return;
         }
 
-        String jsonText = "[{\"text\":\""+message+" \\n\"},{\"text\":\"Sent by: "+sender+" \\n\",\"color\":\"gold\"},{\"text\":\"[Back]\\n\",\"color\":\"green\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/mail\"}},{\"text\":\"[Delete]\\n\",\"color\":\"red\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/deletemail "+messageIndex+"\"}},{\"text\":\"[Reply]\",\"color\":\"aqua\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"sendmail "+sender+"\"}}]";
+        String jsonText;
+        if(mail.hasItemStack() && !mail.isItemReceived()){
+            jsonText = "[{\"text\":\""+message+"\\n\\n\"},{\"text\":\""+LanguageConfig.getSentByText()+" "+sender+"\\n\",\"color\":\"gold\",\"bold\":true,\"underlined\":false},{\"text\":\"["+LanguageConfig.getReceiveText()+"]\\n\",\"color\":\"dark_purple\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/receivemail "+mailIndex+"\"}},{\"text\":\"["+LanguageConfig.getReplyText()+"]\\n\",\"color\":\"blue\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/sendmail "+sender+"\"}},{\"text\":\"["+LanguageConfig.getDeleteText()+"]\\n\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/deletemail "+mailIndex+"\"}},{\"text\":\"["+LanguageConfig.getBackText()+"]\",\"color\":\"green\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/mail\"}}]";
+        }else if(mail.hasMoney() && !mail.isMoneyReceived()){
+            jsonText = "[{\"text\":\""+message+"\\n\\n\"},{\"text\":\""+LanguageConfig.getSentByText()+" "+sender+"\\n\",\"color\":\"gold\",\"bold\":true,\"underlined\":false},{\"text\":\"["+LanguageConfig.getReceiveText()+"]\\n\",\"color\":\"dark_purple\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/receivemail "+mailIndex+"\"}},{\"text\":\"["+LanguageConfig.getReplyText()+"]\\n\",\"color\":\"blue\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/sendmail "+sender+"\"}},{\"text\":\"["+LanguageConfig.getDeleteText()+"]\\n\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/deletemail "+mailIndex+"\"}},{\"text\":\"["+LanguageConfig.getBackText()+"]\",\"color\":\"green\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/mail\"}}]";
+        }else{
+            jsonText = "[{\"text\":\""+message+"\\n\\n\"},{\"text\":\""+LanguageConfig.getSentByText()+" "+sender+"\\n\",\"color\":\"gold\",\"bold\":true,\"underlined\":false},{\"text\":\"["+LanguageConfig.getReplyText()+"]\\n\",\"color\":\"blue\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/sendmail "+sender+"\"}},{\"text\":\"["+LanguageConfig.getDeleteText()+"]\\n\",\"color\":\"red\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/deletemail "+mailIndex+"\"}},{\"text\":\"["+LanguageConfig.getBackText()+"]\",\"color\":\"green\",\"bold\":true,\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/mail\"}}]";
+        }
+
         IChatBaseComponent text = IChatBaseComponent.ChatSerializer.a(jsonText);
 
         pages.add(text);

@@ -1,115 +1,100 @@
 package com.tyrellplayz.servermail;
 
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import javax.annotation.Nullable;
 
-public class Mail implements IMail{
+public class Mail {
 
-    private Player sender;
-    private ServerMail sm;
+    private boolean read;
+
+    private String messageSender;
+    private String message;
+    @Nullable
+    private ItemStack itemStack;
+    @Nullable
+    private boolean itemReceived;
+
+    private double money;
+    @Nullable
+    private boolean moneyReceived;
 
     /**
-     * Send mail to a player
-     * @param sender - Player sending the mail
-     * @param sm - ServerMail
+     * A normal message
+     * @param messageSender - The player that sent the message
+     * @param message - The message
      */
-    public Mail(Player sender, ServerMail sm) {
-        this.sender = sender;
-        this.sm = sm;
+    public Mail(String messageSender, String message, boolean read) {
+        this.messageSender = messageSender;
+        this.message = message;
+        this.read = read;
     }
 
-    @Override
-    public boolean sendMail(Player receiver, String message) {
-        if(receiver==null)return false;
-        if(message.equalsIgnoreCase("")) {
-            sender.sendMessage(ChatColor.RED+"You cant send nothing");
-            return false;
-        }
-        if(sm.hasMailDisabled(receiver.getUniqueId())) {
-            sender.sendMessage(ChatColor.RED+"Player has disabled mail");
-            return false;
-        }
-        if(sm.messagesMap.containsKey(receiver.getUniqueId())){
-            sm.messagesMap.get(receiver.getUniqueId()).addMessage(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
-        }else{
-            List<String> messageList = new ArrayList<>();
-            messageList.add(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
-            sm.messagesMap.put(receiver.getUniqueId(), new Messages(receiver.getUniqueId(), messageList));
-        }
-        saveMail();
-        return true;
+    /**
+     * A message with a gift of an item/block
+     * @param messageSender - The player that sent the message
+     * @param message - The message
+     * @param itemStack - The item/block
+     */
+    public Mail(String messageSender, String message, boolean read, ItemStack itemStack, boolean itemReceived) {
+        this.messageSender = messageSender;
+        this.message = message;
+        this.itemStack = itemStack;
+        this.read = read;
     }
 
-    @Override
-    public boolean sendMail(OfflinePlayer receiver, String message) {
-        if(receiver==null)return false;
-        if(message.equalsIgnoreCase("")) {
-            sender.sendMessage(ChatColor.RED+"You cant send nothing");
-            return false;
-        }
-        if(sm.hasMailDisabled(receiver.getUniqueId())) {
-            sender.sendMessage(ChatColor.RED+"Player has disabled mail");
-            return false;
-        }
-        if(sm.messagesMap.containsKey(receiver.getUniqueId())){
-            sm.messagesMap.get(receiver.getUniqueId()).addMessage(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
-        }else{
-            List<String> messageList = new ArrayList<>();
-            messageList.add(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
-            sm.messagesMap.put(receiver.getUniqueId(), new Messages(receiver.getUniqueId(), messageList));
-        }
-        saveMail();
-        return true;
+    /**
+     * A message with a gift of money
+     * @param messageSender - The player that sent the message
+     * @param message - The message
+     * @param money - How much money
+     */
+    public Mail(String messageSender, String message, boolean read, double money, boolean moneyReceived) {
+        this.messageSender = messageSender;
+        this.message = message;
+        this.money = money;
+        this.read = read;
     }
 
-    @Override
-    public boolean sendMail(UUID receiver, String message) {
-        if(receiver==null)return false;
-        if(message.equalsIgnoreCase("")) {
-            sender.sendMessage(ChatColor.RED+"You cant send nothing");
-            return false;
-        }
-        if(sm.hasMailDisabled(receiver)) {
-            sender.sendMessage(ChatColor.RED+"Player has disabled mail");
-            return false;
-        }
-        if(sm.messagesMap.containsKey(receiver)){
-            sm.messagesMap.get(receiver).addMessage(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
-        }else{
-            List<String> messageList = new ArrayList<>();
-            messageList.add(sender.getName()+"/"+System.currentTimeMillis()+"/"+message);
-            sm.messagesMap.put(receiver, new Messages(receiver, messageList));
-        }
-        saveMail();
-        return true;
+    public String getMessageSender() {
+        return messageSender;
+    }
+    public String getMessage() {
+        return message;
     }
 
-    public Mail(ServerMail sm) {
-        this.sm = sm;
+    @Nullable
+    public ItemStack getItemStack() {
+        return itemStack;
     }
-
-    public boolean sendMailDebug(OfflinePlayer receiver, String message) {
-        if(receiver==null)return false;
-        if(message.equalsIgnoreCase(""))return false;
-        if(sm.hasMailDisabled(receiver.getUniqueId()))return false;
-        if(sm.messagesMap.containsKey(receiver.getUniqueId())){
-            sm.messagesMap.get(receiver.getUniqueId()).addMessage("Debug/"+System.currentTimeMillis()+"/"+message);
-        }else{
-            List<String> messageList = new ArrayList<>();
-            messageList.add("Debug/"+System.currentTimeMillis()+"/"+message);
-            sm.messagesMap.put(receiver.getUniqueId(), new Messages(receiver.getUniqueId(), messageList));
+    public boolean isItemReceived() { return itemReceived; }
+    public boolean transferItem(Player player){
+        if(hasItemStack() && !itemReceived){
+            player.getInventory().addItem(getItemStack());
+            itemReceived=true;
+            return true;
         }
-        saveMail();
-        return true;
+        return false;
     }
+    public boolean hasItemStack(){ return itemStack != null; }
 
-    private void saveMail(){
-        sm.getServer().getScheduler().runTaskAsynchronously(sm, () -> sm.saveMessages());
+    public double getMoney() {
+        return money;
     }
+    public boolean transferMoney(OfflinePlayer player){
+        if(hasMoney() && !moneyReceived){
+            ServerMail.getEcon().depositPlayer(player, money);
+            moneyReceived=true;
+            return true;
+        }
+        return false;
+    }
+    public boolean isMoneyReceived() { return moneyReceived; }
+    public boolean hasMoney(){return !(money == 0); }
+
+    public boolean isRead(){ return read; }
+    public void read() { read = true; }
 
 }
