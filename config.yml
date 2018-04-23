@@ -1,0 +1,48 @@
+# -===============-
+# -=  ServerMail =-
+# -=   <0.2.4>   =-
+# -===============-
+
+# NOTE: For some updates the config will update automatically to add new
+# variables. This will save you time as you wont have to reenter all your
+# data but at a cost. Because of the way Bukkit has setup saving files all
+# comments like this under 'configVersion' will be removed. A config with
+# comments is available here - https://github.com/TyrellPlayz/ServerMail/wiki/Config.
+
+# If you don't want it to automatically update just disable it below, but you will have
+# to update it yourself from - https://github.com/TyrellPlayz/ServerMail/wiki/Config.
+
+# -===============-
+# DO NOT CHANGE OR CONFIG WILL UPDATE IF configAutoUpdate IS ENABLED
+configVersion: 0.4
+# -===============-
+
+# Allow the config to automatically when it has too
+configAutoUpdate: true
+
+# Allow ServerMail to check for updates on enable
+updateChecker: true
+
+# NEW
+# Use toast notifications for mail notifications if server in 1.12.*
+toastNotifications: true
+
+# NEW
+# Allow anyone with permission servermail.updates or oped to get updates message on join
+# if there is a new update. 'updateChecker' must be enable for it to work.
+updateMessageOnJoin: true
+
+# What colour of the glass panes in the menus do you want them to be? Use dye damage value.
+# https://minecraft.gamepedia.com/Dye#Data_values
+paneColour: 7
+
+# Allow items to be sent via Mail?
+itemPackages: true
+
+# Allow money to be sent via Mail? (Will automatically disable if no Vault dependency is found)
+moneyPackages: true
+
+# Blocked words in messages
+blockedWords:
+     - Example
+     - Example2

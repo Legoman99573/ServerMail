@@ -1,0 +1,32 @@
+mail:
+    # Format for mail with no package
+    message:
+        sender: sender
+        read: false
+    Hello world:
+        sender: sender
+        read: true
+
+    # Format for mail with item package
+    message:
+        sender: sender
+        read: false
+        item: Type,data,amount
+        itemReceived: false
+    message:
+        sender: sender
+        read: false
+        item: LOG,1,32
+        itemReceived: true
+
+    # Format for mail with money package
+    message:
+        sender: sender
+        read: false
+        money: number
+        moneyReceived: false
+    message:
+        sender: sender
+        read: false
+        money: 1230
+        moneyReceived: true

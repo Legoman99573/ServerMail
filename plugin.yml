@@ -1,0 +1,71 @@
+main: com.tyrellplayz.servermail.ServerMail
+name: ServerMail
+version: 0.2.4
+website: http://www.youtube.com/legotyrell
+author: TyrellPlayz
+description: ServerMail is a gui based mail system for a spigot server which allows players to send messages to online and offline players.
+softdepend: [ProtocolLib, Vault]
+commands:
+    mail:
+        description: Opens the mail gui
+        permission: servermail.mail
+        permissionMessage: You need the right permission to use this command
+        usage: <command>
+    maildisable:
+        description: Disables the players mail so they can't recieve any mail
+        permission: servermail.disable
+        permissionMessage: You need the right permission to use this command
+        usage: <command>
+    deletemail:
+        description: Delete a mail. Used from book meassage
+        permission: servermail.mail
+        permissionMessage: You need the right permission to use this command
+        usage: <command>
+    sendmail:
+        description: Reply to a mail. Used from book meassage
+        permission: servermail.mail
+        permissionMessage: You need the right permission to use this command
+        usage: <command>
+    sendmail:
+        description: Reply to a mail. Used from book meassage
+        permission: servermail.mail
+        permissionMessage: You need the right permission to use this command
+        usage: <command>
+    sendmail:
+        description: Reply to a mail. Used from book meassage
+        permission: servermail.mail
+        permissionMessage: You need the right permission to use this command
+        usage: <command>
+    receivemail:
+        description: Receive a package from a mail. Used from book message
+        permission: servermail.mail
+        permissionMessage: You need the right permission to use this command
+        usage: <command>
+
+permissions:
+    servermail.mail:
+        description: Allows a player access to /mail
+        default: op
+    servermail.mail.message:
+        description: Allows a player to send messages
+        default: op
+    servermail.mail.items:
+        description: Allows a player to send item packages
+        default: op
+    servermail.mail.money:
+        description: Allows a player to send money packages
+        default: op
+    servermail.mail.*:
+        description: Wildcard permission
+        default: op
+        children:
+            servermail.mail: true
+            servermail.mail.message: true
+            servermail.mail.items: true
+            servermail.mail.money: true
+    servermail.disable:
+        description: Allows a player disable their mail
+        default: op
+    servermail.updates:
+        description: Allows a player to receive new updates on join
+        default: op
