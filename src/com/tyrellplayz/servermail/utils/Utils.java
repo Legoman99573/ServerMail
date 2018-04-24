@@ -26,6 +26,11 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
+    public static int booleanToInt(boolean bool){
+        if(bool)return 1;
+        return 0;
+    }
+
     /**
      * Turns a {@link String} into an {@link ItemStack}. Format: Type,Amount,Data.
      * @param value - {@link String} value to be converted.

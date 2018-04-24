@@ -12,6 +12,8 @@ import com.tyrellplayz.servermail.menus.EnumSort;
 import com.tyrellplayz.servermail.menus.MailMenu;
 import com.tyrellplayz.servermail.menus.MailSendMenu;
 import com.tyrellplayz.servermail.menus.PlayerMenu;
+import com.tyrellplayz.servermail.mysql.MySQLHook;
+import com.tyrellplayz.servermail.mysql.PlayerMailSQLMap;
 import com.tyrellplayz.servermail.nms.*;
 import com.tyrellplayz.servermail.utils.LogMessagesUtil;
 import com.tyrellplayz.servermail.utils.SignMenu;
@@ -46,7 +48,7 @@ public class ServerMail extends JavaPlugin implements IPlugin{
     private static boolean essentials = false;
 
     private List<UUID> mailDisabledPlayers = new ArrayList<>();
-    public PlayerMailMap playerMailMap;
+    public IPlayerDataMap playerMailMap;
     public static List<OfflinePlayer> offlinePlayers;
 
     /**
@@ -60,6 +62,7 @@ public class ServerMail extends JavaPlugin implements IPlugin{
 
     private MainConfig mainConfig;
     private LanguageConfig languageConfig;
+    public MySQLHook mySQLHook;
 
     private NMSUtils nmsUtils;
     public SignMenu signMenu;
@@ -88,9 +91,14 @@ public class ServerMail extends JavaPlugin implements IPlugin{
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-
         mainConfig = new MainConfig(this);
-        playerMailMap = new PlayerMailMap(this);
+        if(MainConfig.getStorageType().equalsIgnoreCase("yml")){
+            playerMailMap = new PlayerMailMap(this);
+        }else if(MainConfig.getStorageType().equalsIgnoreCase("mysql")){
+            mySQLHook = new MySQLHook(this);
+            mySQLHook.createNewPlayerData(Bukkit.getServer().getOfflinePlayer("TyrellPlayz").getUniqueId());
+            playerMailMap = new PlayerMailSQLMap(this);
+        }
 
         if(MainConfig.getUpdateChecker()){
             Updater updater = new Updater(this, 55429);
@@ -124,6 +132,7 @@ public class ServerMail extends JavaPlugin implements IPlugin{
 
     @Override
     public void onDisable() {
+        if(mySQLHook != null)mySQLHook.mySQLCloseConnection();
         logger.info("Server Mail Disabled");
     }
 

@@ -1,6 +1,6 @@
 # -===============-
 # -=  ServerMail =-
-# -=   <0.2.4>   =-
+# -=   <0.3.0>   =-
 # -===============-
 
 # NOTE: For some updates the config will update automatically to add new
@@ -14,7 +14,7 @@
 
 # -===============-
 # DO NOT CHANGE OR CONFIG WILL UPDATE IF configAutoUpdate IS ENABLED
-configVersion: 0.4
+configVersion: 0.5
 # -===============-
 
 # Allow the config to automatically when it has too
@@ -46,3 +46,14 @@ moneyPackages: true
 blockedWords:
      - Example
      - Example2
+
+# Choose the storage mode: yml, mysql
+storageType: yml
+
+# If you are using mySQL please enter your database details below.
+# NOTE: Your password may not be protected in this file.
+sqlHost: 'localhost'
+sqlPort: 3306
+sqlDatabase: 'playerMailData'
+sqlUsername: 'username'
+sqlPassword: 'password'

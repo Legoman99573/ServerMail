@@ -1,5 +1,6 @@
 package com.tyrellplayz.servermail.configs;
 
+import com.tyrellplayz.servermail.IPlayerData;
 import com.tyrellplayz.servermail.InvalidItemStackException;
 import com.tyrellplayz.servermail.Mail;
 import com.tyrellplayz.servermail.ServerMail;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class PlayerMailData implements IConfig{
+public class PlayerMailData implements IConfig, IPlayerData{
 
     private UUID uuid;
     private ServerMail sm;
@@ -76,6 +77,7 @@ public class PlayerMailData implements IConfig{
     /**
      * Handles saving the data
      */
+    @Override
     public void save(){
         configuration.set("name",playerName);
         configuration.set("mailDisabled",mailDisabled);
@@ -157,7 +159,7 @@ public class PlayerMailData implements IConfig{
      */
     public List<Mail> getMailList() { return mailList; }
 
-    private void _setMailList(List<Mail> mail){
+    public void _setMailList(List<Mail> mail){
         this.mailList = mail;
     }
     /**

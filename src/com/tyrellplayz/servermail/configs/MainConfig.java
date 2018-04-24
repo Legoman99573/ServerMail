@@ -12,9 +12,6 @@ import java.util.List;
  */
 public class MainConfig{
 
-    /* DEBUG */
-    private boolean resetOnEnabled = false;
-
     private ServerMail sm;
 
     public MainConfig(ServerMail sm) {
@@ -28,7 +25,6 @@ public class MainConfig{
     public void load(){
         if(!sm.getDataFolder().exists())sm.getDataFolder().mkdirs();
         File file = new File(sm.getDataFolder(), "config.yml");
-        //if(file.exists()&&resetOnEnabled)file.delete();
         if(!file.exists())sm.saveDefaultConfig();
     }
 
@@ -38,10 +34,15 @@ public class MainConfig{
             setToastNotifications(sm.getConfig().getBoolean("toastNotifications"));
             updateMessageOnJoin = sm.getConfig().getBoolean("updateMessageOnJoin");
             setPaneColour((byte)sm.getConfig().getInt("paneColour"));
-            //setStorageType(sm.getConfig().getString("storageType"));
+            setStorageType(sm.getConfig().getString("storageType"));
             itemPackages = sm.getConfig().getBoolean("itemPackages");
             setMoneyPackages(sm.getConfig().getBoolean("moneyPackages"));
             blockedWords = sm.getConfig().getStringList("blockedWords");
+            sqlHost = sm.getConfig().getString("sqlHost");
+            sqlDatabase = sm.getConfig().getString("sqlDatabase");
+            sqlUsername = sm.getConfig().getString("sqlUsername");
+            sqlPassword = sm.getConfig().getString("sqlPassword");
+            sqlPort = sm.getConfig().getInt("sqlPort");
         }catch (Exception ex){
             LogMessagesUtil.errorMessage("Error while enabling","Config","Could not set data from 'config.yml'. Please check that no data in the file equals null/nothing or data is set to the right type of data");
             ex.printStackTrace();
@@ -79,10 +80,10 @@ public class MainConfig{
     private void setStorageType(String value){
         if(value.equalsIgnoreCase("yml")){
             storageType = "yml";
-        }else if(value.equalsIgnoreCase("ess")){
-            storageType = "ess";
+        }else if(value.equalsIgnoreCase("mysql")){
+            storageType = "mysql";
         }else{
-            LogMessagesUtil.errorMessage("Error while loading 'config.yml'", "Configs", "'storageType' is invalid. Please choose 'yml' or 'ess'");
+            LogMessagesUtil.errorMessage("Error while loading 'config.yml'", "Configs", "'storageType' is invalid. Please choose 'yml' or 'mysql'");
             Bukkit.getServer().getPluginManager().disablePlugin(sm);
         }
     }
@@ -130,4 +131,17 @@ public class MainConfig{
     public static boolean getUpdateMessageOnJoin() {
         return updateMessageOnJoin;
     }
+
+    private static String sqlHost, sqlDatabase, sqlUsername, sqlPassword;
+    private static int sqlPort;
+
+    public static String getSQLHost() { return sqlHost; }
+
+    public static String getSQLDatabase() { return sqlDatabase; }
+
+    public static String getSQLUsername() { return sqlUsername; }
+
+    public static String getSQLPassword() { return sqlPassword; }
+
+    public static int getSQLPort() { return sqlPort; }
 }

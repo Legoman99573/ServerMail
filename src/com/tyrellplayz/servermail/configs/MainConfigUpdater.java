@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MainConfigUpdater {
 
-    private static String thisConfigVersion = "0.4";
+    private static String thisConfigVersion = "0.5";
 
     private ServerMail sm;
     private String configVersion;
@@ -56,6 +56,12 @@ public class MainConfigUpdater {
         boolean moneyPackages = sm.getConfig().getBoolean("moneyPackages");
         List<String> blockedWords = sm.getConfig().getStringList("blockedWords");
 
+        String sqlHost = sm.getConfig().getString("sqlHost");
+        String sqlDatabase = sm.getConfig().getString("sqlDatabase");
+        String sqlUsername = sm.getConfig().getString("sqlUsername");
+        String sqlPassword = sm.getConfig().getString("sqlPassword");
+        int sqlPort = sm.getConfig().getInt("sqlPort");
+
         // Replace old config with new config
         File file = new File(sm.getDataFolder(),"config.yml");
         if(file.exists()) //noinspection ResultOfMethodCallIgnored
@@ -73,6 +79,12 @@ public class MainConfigUpdater {
         sm.getConfig().set("itemPackages", itemPackages);
         sm.getConfig().set("moneyPackages", moneyPackages);
         sm.getConfig().set("blockedWords", blockedWords);
+
+        sm.getConfig().set("sqlHost", sqlHost);
+        sm.getConfig().set("sqlDatabase", sqlDatabase);
+        sm.getConfig().set("sqlUsername", sqlUsername);
+        sm.getConfig().set("sqlPassword", sqlPassword);
+        sm.getConfig().set("sqlPort", sqlPort);
 
         // Save new config with new data
         sm.saveConfig();
