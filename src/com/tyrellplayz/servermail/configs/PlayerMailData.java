@@ -58,7 +58,13 @@ public class PlayerMailData implements IConfig{
     @Override
     public void load() {
         try{
-            if(!file.exists())file.createNewFile();
+            if(!file.exists()) {
+                file.createNewFile();
+                configuration.load(file);
+                configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+                configuration.set("mailDisable", false);
+                return;
+            }
             configuration.load(file);
         }catch (Exception ex){
             LogMessagesUtil.errorMessage("Error while loading player data","Player data","Was unable to load data for "+uuid.toString());
@@ -72,6 +78,7 @@ public class PlayerMailData implements IConfig{
      */
     public void save(){
         configuration.set("name",playerName);
+        configuration.set("mailDisabled",mailDisabled);
         configuration.set("mail",null);
         try{
             configuration.save(file);
@@ -102,20 +109,27 @@ public class PlayerMailData implements IConfig{
 
     @Override
     public void reload() {
-        configuration.getString("");
+        // Checks to see if player data file contains player name. If not set it.
+        if(configuration.getString("name") == null){
+            configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+        }
+        // Sets the players name
+        playerName = configuration.getString("name");
+        // Sets the player mail disabled
+        mailDisabled = configuration.getBoolean("mailDisabled");
         List<Mail> mailList = new ArrayList<>();
-        // Gets all message from player data config
+        // Load all mail from player data file
         if(configuration.getConfigurationSection("mail") !=null){
             Set<String> mail = configuration.getConfigurationSection("mail").getKeys(false);
             for(String message:mail){
                 String sender = configuration.getString("mail."+message+".sender");
                 boolean read = configuration.getBoolean("mail."+message+".read");
                 String item = configuration.getString("mail."+message+".item");
-                double money = configuration.getDouble("mail."+message+"money");
+                double money = configuration.getDouble("mail."+message+".money");
                 if(item==null && money==0){
                     mailList.add(new Mail(sender, message, read));
                 }else if(item!=null && money==0){
-                    boolean itemReceived = configuration.getBoolean("mail."+message+"itemReceived");
+                    boolean itemReceived = configuration.getBoolean("mail."+message+".itemReceived");
                     try{
                         ItemStack itemStack = Utils.stringToItemStack(item);
                         mailList.add(new Mail(sender, message, read, itemStack, itemReceived));
@@ -126,7 +140,7 @@ public class PlayerMailData implements IConfig{
                         return;
                     }
                 }else if(item==null && money > 0){
-                    boolean moneyReceived = configuration.getBoolean("mail."+message+"moneyReceived");
+                    boolean moneyReceived = configuration.getBoolean("mail."+message+".moneyReceived");
                     mailList.add(new Mail(sender, message, read, money, moneyReceived));
                 }
             }
@@ -186,8 +200,26 @@ public class PlayerMailData implements IConfig{
         }
     }
 
-    private static String playerName;
-    public static String getPlayerName() {
+    private String playerName;
+
+    /**
+     * Gets the players name set in config
+     * @return
+     */
+    public String getPlayerName() {
         return playerName;
+    }
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+        sm.getServer().getScheduler().runTaskAsynchronously(sm, this::save);
+    }
+
+    private boolean mailDisabled;
+    public boolean isMailDisabled() {
+        return mailDisabled;
+    }
+    public void setMailDisabled(boolean mailDisabled) {
+        this.mailDisabled = mailDisabled;
+        sm.getServer().getScheduler().runTaskAsynchronously(sm, this::save);
     }
 }

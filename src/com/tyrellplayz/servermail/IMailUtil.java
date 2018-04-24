@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public interface IMail {
+public interface IMailUtil {
 
     /**
      * Sends mail to a player

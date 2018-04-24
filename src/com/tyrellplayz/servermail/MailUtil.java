@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public class MailUtil implements IMail{
+public class MailUtil implements IMailUtil {
 
     private Player sender;
     private ServerMail sm;
@@ -31,11 +31,11 @@ public class MailUtil implements IMail{
             sender.sendMessage(ChatColor.RED+LanguageConfig.getCantSendNothingText());
             return false;
         }
-        if(sm.hasMailDisabled(receiver.getUniqueId())) {
-            sender.sendMessage(ChatColor.RED+LanguageConfig.getPlayerDisabledMailText());
-            return false;
-        }
         if(sm.playerMailMap.contains(receiver.getUniqueId())){
+            if(sm.playerMailMap.get(receiver.getUniqueId()).isMailDisabled()){
+                sender.sendMessage(ChatColor.RED+LanguageConfig.getPlayerDisabledMailText());
+                return false;
+            }
             sendMailTask(receiver.getUniqueId(), message);
             sender.sendMessage(ChatColor.GREEN+LanguageConfig.getMailSentText());
         }else {
@@ -52,11 +52,11 @@ public class MailUtil implements IMail{
             sender.sendMessage(ChatColor.RED+LanguageConfig.getCantSendNothingText());
             return false;
         }
-        if(sm.hasMailDisabled(receiver.getUniqueId())) {
-            sender.sendMessage(ChatColor.RED+LanguageConfig.getPlayerDisabledMailText());
-            return false;
-        }
         if(sm.playerMailMap.contains(receiver.getUniqueId())){
+            if(sm.playerMailMap.get(receiver.getUniqueId()).isMailDisabled()){
+                sender.sendMessage(ChatColor.RED+LanguageConfig.getPlayerDisabledMailText());
+                return false;
+            }
             sendMailTask(receiver.getUniqueId(), message, itemStack);
             sender.sendMessage(ChatColor.GREEN+LanguageConfig.getMailSentText());
         }else {
@@ -73,39 +73,15 @@ public class MailUtil implements IMail{
             sender.sendMessage(ChatColor.RED+LanguageConfig.getCantSendNothingText());
             return false;
         }
-        if(sm.hasMailDisabled(receiver.getUniqueId())) {
-            sender.sendMessage(ChatColor.RED+LanguageConfig.getPlayerDisabledMailText());
-            return false;
-        }
         if(sm.playerMailMap.contains(receiver.getUniqueId())){
+            if(sm.playerMailMap.get(receiver.getUniqueId()).isMailDisabled()){
+                sender.sendMessage(ChatColor.RED+LanguageConfig.getPlayerDisabledMailText());
+                return false;
+            }
             sendMailTask(receiver.getUniqueId(), message, money);
             sender.sendMessage(ChatColor.GREEN+LanguageConfig.getMailSentText());
         }else {
             sender.sendMessage(ChatColor.RED+LanguageConfig.getPlayerNeverOnline());
-            return false;
-        }
-        return true;
-    }
-
-    public MailUtil(ServerMail sm) {
-        this.sm = sm;
-    }
-
-    public boolean sendMailDebug(OfflinePlayer receiver, String message) {
-        if(receiver==null)return false;
-        if(message.equalsIgnoreCase("")) {
-            ServerMail.logger.info(ChatColor.RED+LanguageConfig.getCantSendNothingText());
-            return false;
-        }
-        if(sm.hasMailDisabled(receiver.getUniqueId())) {
-            ServerMail.logger.info(ChatColor.RED+LanguageConfig.getPlayerDisabledMailText());
-            return false;
-        }
-        if(sm.playerMailMap.contains(receiver.getUniqueId())){
-            sendMailTaskDebug(receiver.getUniqueId(), message);
-            ServerMail.logger.info(ChatColor.GREEN+LanguageConfig.getMailSentText());
-        }else {
-            ServerMail.logger.info(ChatColor.RED+LanguageConfig.getPlayerNeverOnline());
             return false;
         }
         return true;
@@ -139,17 +115,6 @@ public class MailUtil implements IMail{
             public void run() {
                 String newMessage = Utils.removeBlockedWords(message);
                 sm.playerMailMap.get(receiver).addMail(new Mail(sender.getName(), newMessage, false, money, false));
-                sm.getServer().getScheduler().runTaskAsynchronously(sm, () -> sm.playerMailMap.get(receiver).save());
-            }
-        });
-    }
-
-    private void sendMailTaskDebug(final UUID receiver, final String message){
-        sm.getServer().getScheduler().runTaskAsynchronously(sm, new Runnable() {
-            @Override
-            public void run() {
-                String newMessage = Utils.removeBlockedWords(message);
-                sm.playerMailMap.get(receiver).addMail(new Mail("Debug", newMessage, false));
                 sm.getServer().getScheduler().runTaskAsynchronously(sm, () -> sm.playerMailMap.get(receiver).save());
             }
         });

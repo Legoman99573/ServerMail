@@ -37,11 +37,12 @@ public class ChatEvents implements Listener{
             }
             if(sm.sendMoneyAmountMap.containsKey(event.getPlayer())){
                 MailUtil mail = new MailUtil(event.getPlayer(), sm);
-                mail.sendMail(sm.sendMessageMap.get(event.getPlayer()), ChatColor.translateAlternateColorCodes('&', message), sm.sendMoneyAmountMap.get(event.getPlayer()));
-                event.setCancelled(true);
+                if(mail.sendMail(sm.sendMessageMap.get(event.getPlayer()), ChatColor.translateAlternateColorCodes('&', message), sm.sendMoneyAmountMap.get(event.getPlayer()))){
+                    ServerMail.getEcon().withdrawPlayer(event.getPlayer(),sm.sendMoneyAmountMap.get(event.getPlayer()));
+                }
                 sm.sendMessageMap.remove(event.getPlayer());
-                ServerMail.getEcon().withdrawPlayer(event.getPlayer(),sm.sendMoneyAmountMap.get(event.getPlayer()));
                 sm.sendMoneyAmountMap.remove(event.getPlayer());
+                event.setCancelled(true);
                 return;
             }
             MailUtil mail = new MailUtil(event.getPlayer(), sm);
@@ -66,9 +67,11 @@ public class ChatEvents implements Listener{
                 event.getPlayer().sendMessage(ChatColor.RED+LanguageConfig.getTypeItemText()+" "+LanguageConfig.getCancelText());
                 return;
             }
-            event.getPlayer().getInventory().clear(event.getPlayer().getInventory().getHeldItemSlot());
+
             MailUtil mail = new MailUtil(event.getPlayer(), sm);
-            mail.sendMail(sm.sendItemMap.get(event.getPlayer()), ChatColor.translateAlternateColorCodes('&',message), itemStack);
+            if(mail.sendMail(sm.sendItemMap.get(event.getPlayer()), ChatColor.translateAlternateColorCodes('&',message), itemStack)){
+                event.getPlayer().getInventory().clear(event.getPlayer().getInventory().getHeldItemSlot());
+            }
             event.setCancelled(true);
             sm.sendItemMap.remove(event.getPlayer());
         }else

@@ -38,9 +38,11 @@ public class CommandMail implements CommandExecutor{
                 return true;
             }
             if(sender instanceof Player){
-                if(sm.disableMail((Player)sender)){
+                if(sm.playerMailMap.get(((Player) sender).getUniqueId()).isMailDisabled()){
+                    sm.playerMailMap.get(((Player) sender).getUniqueId()).setMailDisabled(true);
                     sender.sendMessage(ChatColor.GREEN+LanguageConfig.getDisableMailText());
                 }else{
+                    sm.playerMailMap.get(((Player) sender).getUniqueId()).setMailDisabled(false);
                     sender.sendMessage(ChatColor.YELLOW+LanguageConfig.getEnableMailText());
                 }
             }else{

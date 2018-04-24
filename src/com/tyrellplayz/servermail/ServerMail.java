@@ -6,7 +6,6 @@ import com.tyrellplayz.servermail.commands.CommandReceiveMail;
 import com.tyrellplayz.servermail.commands.CommandSendMail;
 import com.tyrellplayz.servermail.configs.LanguageConfig;
 import com.tyrellplayz.servermail.configs.MainConfig;
-import com.tyrellplayz.servermail.configs.StorageConfig;
 import com.tyrellplayz.servermail.events.ChatEvents;
 import com.tyrellplayz.servermail.events.PlayerEvents;
 import com.tyrellplayz.servermail.menus.EnumSort;
@@ -19,7 +18,6 @@ import com.tyrellplayz.servermail.utils.SignMenu;
 import com.tyrellplayz.servermail.utils.ToastMessage;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -61,13 +59,12 @@ public class ServerMail extends JavaPlugin implements IPlugin{
     public HashMap<Player,Double> sendMoneyAmountMap = new HashMap<>();
 
     private MainConfig mainConfig;
-    private StorageConfig storageConfig;
     private LanguageConfig languageConfig;
 
     private NMSUtils nmsUtils;
     public SignMenu signMenu;
 
-    public static String serverVersion;
+    private static String serverVersion;
     public ToastMessage toastMessage;
 
     @Override
@@ -84,27 +81,15 @@ public class ServerMail extends JavaPlugin implements IPlugin{
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        logger.info("Checking for ProtocolLib...");
-        if(!getServer().getPluginManager().isPluginEnabled("ProtocolLib")){
-            LogMessagesUtil.errorMessage("Error while enabling plugin",null,"No ProtocolLib dependency found!");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        logger.info("Checking for Vault...");
-        if (!setupEconomy() ) {
-            logger.warning("No Vault dependency found! Money packages are disabled");
-        }
+        registerHooks();
         languageConfig = new LanguageConfig(this);
         if(!setupNMSUtils()){
             LogMessagesUtil.errorMessage("Error while enabling plugin",null,"Server is not the right version. Plugin only works on versions 1.9.* - 1.12.*");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        if(getServer().getPluginManager().isPluginEnabled("Essentials")) essentials = true;
 
         mainConfig = new MainConfig(this);
-        storageConfig = new StorageConfig(this);
-
         playerMailMap = new PlayerMailMap(this);
 
         if(MainConfig.getUpdateChecker()){
@@ -117,7 +102,7 @@ public class ServerMail extends JavaPlugin implements IPlugin{
             }
         }
         offlinePlayers = Arrays.asList(getServer().getOfflinePlayers());
-        /*
+        /* DEBUG
         offlinePlayers = new ArrayList<>();
         for(int x = 0; x < 100; x++){
             offlinePlayers.add(Bukkit.getServer().getOfflinePlayer("TyrellPlayz"));
@@ -126,9 +111,6 @@ public class ServerMail extends JavaPlugin implements IPlugin{
         offlinePlayers.sort(Comparator.comparing(playerOne -> (playerOne).getName()));
 
         signMenu = new SignMenu(this);
-
-        //loadMessages();
-        loadMailDisabledPlayers();
 
         registerEvents();
         registerCommands();
@@ -142,8 +124,6 @@ public class ServerMail extends JavaPlugin implements IPlugin{
 
     @Override
     public void onDisable() {
-        //saveMessages();
-        saveMailDisabledPlayers();
         logger.info("Server Mail Disabled");
     }
 
@@ -168,6 +148,20 @@ public class ServerMail extends JavaPlugin implements IPlugin{
     @Override
     public void registerTasks() {
 
+    }
+
+    private void registerHooks(){
+        logger.info("Checking for ProtocolLib...");
+        if(!getServer().getPluginManager().isPluginEnabled("ProtocolLib")){
+            LogMessagesUtil.errorMessage("Error while enabling plugin",null,"No ProtocolLib dependency found!");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        logger.info("Checking for Vault...");
+        if (!setupEconomy() ) {
+            logger.warning("No Vault dependency found! Money packages are disabled");
+        }
+        if(getServer().getPluginManager().isPluginEnabled("Essentials")) essentials = true;
     }
 
     // Vault
@@ -220,56 +214,7 @@ public class ServerMail extends JavaPlugin implements IPlugin{
         // because if it is, our actionbar would not be null
         return nmsUtils != null;
     }
-
     public NMSUtils getNmsUtils() { return nmsUtils; }
 
-    private FileConfiguration getStorageConfig() { return storageConfig.fileConfiguration; }
-    private File getStorageConfigFile(){ return storageConfig.file; }
-
-    /**
-     * Disables a players mail. If already in the list it will remove player
-     * @param player
-     * @return True if added to list, False if removed from list
-     */
-    public boolean disableMail(Player player){
-        if(mailDisabledPlayers.contains(player.getUniqueId())){
-            mailDisabledPlayers.remove(player.getUniqueId());
-            getServer().getScheduler().runTaskAsynchronously(this, this::saveMailDisabledPlayers);
-            return false;
-        }
-        mailDisabledPlayers.add(player.getUniqueId());
-        getServer().getScheduler().runTaskAsynchronously(this, this::saveMailDisabledPlayers);
-        return true;
-    }
-    /**
-     * Checks if player has mail disabled
-     * @param player
-     * @return
-     */
-    public boolean hasMailDisabled(UUID player){
-        if(mailDisabledPlayers.contains(player))return true;
-        return false;
-    }
-
-    private void loadMailDisabledPlayers(){
-        List<String> uuids = getStorageConfig().getStringList("mailDisabled");
-        for(String uuidString: uuids){
-            UUID uuid = UUID.fromString(uuidString);
-            mailDisabledPlayers.add(uuid);
-        }
-    }
-
-    public void saveMailDisabledPlayers(){
-        List<String> uuids = new ArrayList<>();
-        for(UUID uuid: mailDisabledPlayers){
-            uuids.add(uuid.toString());
-        }
-        getStorageConfig().set("mailDisabled", uuids);
-        try{
-            getStorageConfig().save(getStorageConfigFile());
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
 
 }
