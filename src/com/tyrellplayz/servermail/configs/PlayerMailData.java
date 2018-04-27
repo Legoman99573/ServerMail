@@ -34,13 +34,6 @@ public class PlayerMailData implements IConfig, IPlayerData{
         }
         this.file = new File(folder, uuid+".yml");
         this.configuration = new YamlConfiguration();
-        if(configuration.getString("name") == null) {
-            configuration.addDefault("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
-            configuration.addDefault("mailDisabled", false);
-            configuration.options().copyDefaults(true);
-            save();
-            return;
-        }
         load();
         reload();
     }
@@ -93,30 +86,25 @@ public class PlayerMailData implements IConfig, IPlayerData{
         configuration.set("name", playerName);
         configuration.set("mailDisabled", mailDisabled);
         configuration.set("mail",null);
-        try {
-            configuration.save(file);
-        } catch (Exception ex) {
-            Log.error("Was unable to save player data for " + uuid.toString());
-            ex.printStackTrace();
-        }
 
         for(Mail mail:mailList){
-            String pathPrefix = "mail."+mail.getMessage()+".";
-            configuration.set(pathPrefix+"sender",mail.getMessageSender());
-            configuration.set(pathPrefix+"read",mail.isRead());
-            if(mail.hasItemStack()){
-                configuration.set(pathPrefix+"item",Utils.itemStackToString(mail.getItemStack()));
-                configuration.set(pathPrefix+"itemReceived",mail.isItemReceived());
-            }else if(mail.hasMoney()){
-                configuration.set(pathPrefix+"money",mail.getMoney());
-                configuration.set(pathPrefix+"moneyReceived",mail.isMoneyReceived());
+            if (!mailDisabled || Bukkit.getPlayer(mail.getMessageSender()).isOp()) {
+                String pathPrefix = "mail." + mail.getMessage() + ".";
+                configuration.addDefault(pathPrefix + "sender", mail.getMessageSender());
+                configuration.addDefault(pathPrefix + "read", mail.isRead());
+                if(mail.hasItemStack()){
+                    configuration.addDefault(pathPrefix+"item",Utils.itemStackToString(mail.getItemStack()));
+                    configuration.addDefault(pathPrefix+"itemReceived",mail.isItemReceived());
+                }else if(mail.hasMoney()){
+                    configuration.addDefault(pathPrefix+"money",mail.getMoney());
+                    configuration.addDefault(pathPrefix+"moneyReceived",mail.isMoneyReceived());
+                }
+                configuration.options().copyDefaults(true);
+                save();
+                return;
+            } else {
+                LogMessagesUtil.warningMessage("Was unable to post mail data for " + uuid.toString(), "Player save data", "Sender:" + mail.getMessageSender());
             }
-        }
-        try{
-            configuration.save(file);
-        }catch (Exception ex){
-            Log.error("Was unable to save player data for "+uuid.toString());
-            ex.printStackTrace();
         }
     }
 
