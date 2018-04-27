@@ -40,9 +40,6 @@ public class PlayerMailData implements IConfig, IPlayerData{
             configuration.options().copyDefaults(true);
             save();
             return;
-        } else {
-            configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
-            save();
         }
         load();
         reload();
@@ -79,9 +76,6 @@ public class PlayerMailData implements IConfig, IPlayerData{
                 configuration.options().copyDefaults(true);
                 save();
                 return;
-            } else {
-                configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
-                save();
             }
             configuration.load(file);
         }catch (Exception ex){
