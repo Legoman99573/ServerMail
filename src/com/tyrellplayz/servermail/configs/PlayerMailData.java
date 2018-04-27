@@ -89,32 +89,26 @@ public class PlayerMailData implements IConfig, IPlayerData{
             configuration.save(file);
         } catch (Exception ex) {
             LogMessagesUtil.errorMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
-            ex.printStackTrace();
         }
 
         for(Mail mail:mailList){
-            if (!mailDisabled || Bukkit.getPlayer(mail.getMessageSender()).isOp()) {
-                String pathPrefix = "mail." + mail.getMessage() + ".";
-                configuration.addDefault(pathPrefix + "sender", mail.getMessageSender());
-                configuration.addDefault(pathPrefix + "read", mail.isRead());
-                if(mail.hasItemStack()){
-                    configuration.addDefault(pathPrefix+"item",Utils.itemStackToString(mail.getItemStack()));
-                    configuration.addDefault(pathPrefix+"itemReceived",mail.isItemReceived());
-                }else if(mail.hasMoney()){
-                    configuration.addDefault(pathPrefix+"money",mail.getMoney());
-                    configuration.addDefault(pathPrefix+"moneyReceived",mail.isMoneyReceived());
-                }
-                configuration.options().copyDefaults(true);
-                return;
-            } else {
-                LogMessagesUtil.warningMessage("Was unable to post mail data for " + uuid.toString(), "Player save data", "Sender:" + mail.getMessageSender());
+            String pathPrefix = "mail." + mail.getMessage() + ".";
+            configuration.addDefault(pathPrefix + "sender", mail.getMessageSender());
+            configuration.addDefault(pathPrefix + "read", mail.isRead());
+            if(mail.hasItemStack()){
+                configuration.addDefault(pathPrefix+"item",Utils.itemStackToString(mail.getItemStack()));
+                configuration.addDefault(pathPrefix+"itemReceived",mail.isItemReceived());
+            }else if(mail.hasMoney()){
+                configuration.addDefault(pathPrefix+"money",mail.getMoney());
+                configuration.addDefault(pathPrefix+"moneyReceived",mail.isMoneyReceived());
             }
+            configuration.options().copyDefaults(true);
+            return;
         }
         try {
             configuration.save(file);
         } catch (Exception ex) {
-            LogMessagesUtil.errorMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
-            ex.printStackTrace();
+            LogMessagesUtil.warningMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
         }
     }
 
