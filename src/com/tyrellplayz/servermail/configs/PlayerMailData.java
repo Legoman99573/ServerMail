@@ -9,7 +9,6 @@ import com.tyrellplayz.servermail.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -71,7 +70,7 @@ public class PlayerMailData implements IConfig, IPlayerData{
                 return;
             }
             configuration.load(file);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             LogMessagesUtil.errorMessage("Error while loading player data","Player data","Was unable to load data for "+uuid.toString());
             ex.printStackTrace();
             Bukkit.getServer().getPluginManager().disablePlugin(sm);
@@ -86,6 +85,12 @@ public class PlayerMailData implements IConfig, IPlayerData{
         configuration.set("name", playerName);
         configuration.set("mailDisabled", mailDisabled);
         configuration.set("mail",null);
+        try {
+            configuration.save(file);
+        } catch (Exception ex) {
+            LogMessagesUtil.errorMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
+            ex.printStackTrace();
+        }
 
         for(Mail mail:mailList){
             if (!mailDisabled || Bukkit.getPlayer(mail.getMessageSender()).isOp()) {
@@ -100,11 +105,16 @@ public class PlayerMailData implements IConfig, IPlayerData{
                     configuration.addDefault(pathPrefix+"moneyReceived",mail.isMoneyReceived());
                 }
                 configuration.options().copyDefaults(true);
-                save();
                 return;
             } else {
                 LogMessagesUtil.warningMessage("Was unable to post mail data for " + uuid.toString(), "Player save data", "Sender:" + mail.getMessageSender());
             }
+        }
+        try {
+            configuration.save(file);
+        } catch (Exception ex) {
+            LogMessagesUtil.errorMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
+            ex.printStackTrace();
         }
     }
 
