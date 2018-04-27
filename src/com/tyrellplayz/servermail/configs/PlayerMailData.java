@@ -29,9 +29,21 @@ public class PlayerMailData implements IConfig, IPlayerData{
         this.uuid = uuid;
         this.sm = sm;
         File folder = new File(sm.getDataFolder()+ File.separator+"players");
-        if(!folder.exists())folder.mkdirs();
+        if(!folder.exists()) {
+            folder.mkdirs();
+        }
         this.file = new File(folder, uuid+".yml");
         this.configuration = new YamlConfiguration();
+        if(configuration.getString("name") == null) {
+            configuration.addDefault("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+            configuration.addDefault("mailDisabled", false);
+            configuration.options().copyDefaults(true);
+            save();
+            return;
+        } else {
+            configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+            save();
+        }
         load();
         reload();
     }
@@ -62,9 +74,14 @@ public class PlayerMailData implements IConfig, IPlayerData{
             if(!file.exists()) {
                 file.createNewFile();
                 configuration.load(file);
-                configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
-                configuration.set("mailDisable", false);
+                configuration.addDefault("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+                configuration.addDefault("mailDisabled", false);
+                configuration.options().copyDefaults(true);
+                save();
                 return;
+            } else {
+                configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+                save();
             }
             configuration.load(file);
         }catch (Exception ex){
@@ -79,13 +96,13 @@ public class PlayerMailData implements IConfig, IPlayerData{
      */
     @Override
     public void save(){
-        configuration.set("name",playerName);
-        configuration.set("mailDisabled",mailDisabled);
+        configuration.set("name", playerName);
+        configuration.set("mailDisabled", mailDisabled);
         configuration.set("mail",null);
-        try{
+        try {
             configuration.save(file);
-        }catch (Exception ex){
-            Log.error("Was unable to save player data for "+uuid.toString());
+        } catch (Exception ex) {
+            Log.error("Was unable to save player data for " + uuid.toString());
             ex.printStackTrace();
         }
 
@@ -113,7 +130,7 @@ public class PlayerMailData implements IConfig, IPlayerData{
     public void reload() {
         // Checks to see if player data file contains player name. If not set it.
         if(configuration.getString("name") == null){
-            configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+            configuration.addDefault("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
         }
         // Sets the players name
         playerName = configuration.getString("name");
