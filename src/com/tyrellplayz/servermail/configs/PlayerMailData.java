@@ -61,10 +61,12 @@ public class PlayerMailData implements IConfig, IPlayerData{
     public void load() {
         try{
             if(!file.exists()) {
+                LogMessagesUtil.warningMessage("Missing config file for " + uuid.toString(), "Player Data", "Generating file for " + Bukkit.getServer().getOfflinePlayer(uuid).getName());
                 file.createNewFile();
                 configuration.load(file);
                 configuration.addDefault("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
                 configuration.addDefault("mailDisabled", false);
+                configuration.set("mail" ,null);
                 configuration.options().copyDefaults(true);
                 save();
                 return;
@@ -85,30 +87,25 @@ public class PlayerMailData implements IConfig, IPlayerData{
         configuration.set("name", playerName);
         configuration.set("mailDisabled", mailDisabled);
         configuration.set("mail",null);
-        try {
-            configuration.save(file);
-        } catch (Exception ex) {
-            LogMessagesUtil.errorMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
-        }
 
         for(Mail mail:mailList){
             String pathPrefix = "mail." + mail.getMessage() + ".";
-            configuration.addDefault(pathPrefix + "sender", mail.getMessageSender());
-            configuration.addDefault(pathPrefix + "read", mail.isRead());
+            configuration.set(pathPrefix + "sender", mail.getMessageSender());
+            configuration.set(pathPrefix + "read", mail.isRead());
             if(mail.hasItemStack()){
-                configuration.addDefault(pathPrefix+"item",Utils.itemStackToString(mail.getItemStack()));
-                configuration.addDefault(pathPrefix+"itemReceived",mail.isItemReceived());
+                configuration.set(pathPrefix+"item",Utils.itemStackToString(mail.getItemStack()));
+                configuration.set(pathPrefix+"itemReceived",mail.isItemReceived());
             }else if(mail.hasMoney()){
-                configuration.addDefault(pathPrefix+"money",mail.getMoney());
-                configuration.addDefault(pathPrefix+"moneyReceived",mail.isMoneyReceived());
+                configuration.set(pathPrefix+"money",mail.getMoney());
+                configuration.set(pathPrefix+"moneyReceived",mail.isMoneyReceived());
             }
-            configuration.options().copyDefaults(true);
             return;
         }
         try {
             configuration.save(file);
         } catch (Exception ex) {
-            LogMessagesUtil.warningMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
+            LogMessagesUtil.errorMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
+            ex.printStackTrace();
         }
     }
 
