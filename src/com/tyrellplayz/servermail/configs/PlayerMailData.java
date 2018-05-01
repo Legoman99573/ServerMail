@@ -9,7 +9,6 @@ import com.tyrellplayz.servermail.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -29,7 +28,9 @@ public class PlayerMailData implements IConfig, IPlayerData{
         this.uuid = uuid;
         this.sm = sm;
         File folder = new File(sm.getDataFolder()+ File.separator+"players");
-        if(!folder.exists())folder.mkdirs();
+        if(!folder.exists()) {
+            folder.mkdirs();
+        }
         this.file = new File(folder, uuid+".yml");
         this.configuration = new YamlConfiguration();
         load();
@@ -60,14 +61,18 @@ public class PlayerMailData implements IConfig, IPlayerData{
     public void load() {
         try{
             if(!file.exists()) {
+                LogMessagesUtil.warningMessage("Missing config file for " + uuid.toString(), "Player Data", "Generating file for " + Bukkit.getServer().getOfflinePlayer(uuid).getName());
                 file.createNewFile();
                 configuration.load(file);
-                configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
-                configuration.set("mailDisable", false);
+                configuration.addDefault("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+                configuration.addDefault("mailDisabled", false);
+                configuration.set("mail" ,null);
+                configuration.options().copyDefaults(true);
+                save();
                 return;
             }
             configuration.load(file);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             LogMessagesUtil.errorMessage("Error while loading player data","Player data","Was unable to load data for "+uuid.toString());
             ex.printStackTrace();
             Bukkit.getServer().getPluginManager().disablePlugin(sm);
@@ -79,20 +84,14 @@ public class PlayerMailData implements IConfig, IPlayerData{
      */
     @Override
     public void save(){
-        configuration.set("name",playerName);
-        configuration.set("mailDisabled",mailDisabled);
+        configuration.set("name", playerName);
+        configuration.set("mailDisabled", mailDisabled);
         configuration.set("mail",null);
-        try{
-            configuration.save(file);
-        }catch (Exception ex){
-            Log.error("Was unable to save player data for "+uuid.toString());
-            ex.printStackTrace();
-        }
 
         for(Mail mail:mailList){
-            String pathPrefix = "mail."+mail.getMessage()+".";
-            configuration.set(pathPrefix+"sender",mail.getMessageSender());
-            configuration.set(pathPrefix+"read",mail.isRead());
+            String pathPrefix = "mail." + mail.getMessage() + ".";
+            configuration.set(pathPrefix + "sender", mail.getMessageSender());
+            configuration.set(pathPrefix + "read", mail.isRead());
             if(mail.hasItemStack()){
                 configuration.set(pathPrefix+"item",Utils.itemStackToString(mail.getItemStack()));
                 configuration.set(pathPrefix+"itemReceived",mail.isItemReceived());
@@ -100,11 +99,12 @@ public class PlayerMailData implements IConfig, IPlayerData{
                 configuration.set(pathPrefix+"money",mail.getMoney());
                 configuration.set(pathPrefix+"moneyReceived",mail.isMoneyReceived());
             }
+            return;
         }
-        try{
+        try {
             configuration.save(file);
-        }catch (Exception ex){
-            Log.error("Was unable to save player data for "+uuid.toString());
+        } catch (Exception ex) {
+            LogMessagesUtil.errorMessage("Was unable to save player data for " + uuid.toString(), "Player save data", "To: " + configuration.getString("name") + ", MailDisabled: " + configuration.getString("mailDisabled"));
             ex.printStackTrace();
         }
     }
@@ -113,7 +113,7 @@ public class PlayerMailData implements IConfig, IPlayerData{
     public void reload() {
         // Checks to see if player data file contains player name. If not set it.
         if(configuration.getString("name") == null){
-            configuration.set("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
+            configuration.addDefault("name", Bukkit.getServer().getOfflinePlayer(uuid).getName());
         }
         // Sets the players name
         playerName = configuration.getString("name");
