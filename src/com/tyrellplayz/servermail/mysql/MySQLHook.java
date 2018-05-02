@@ -12,7 +12,7 @@ import java.util.UUID;
 public class MySQLHook {
 
     private ServerMail sm;
-    public MySQLHook(ServerMail sm) { this.sm = sm; mySQLSetUp(); mySQLOpenConnection();}
+    public MySQLHook(ServerMail sm) { this.sm = sm; mySQLSetUp(); mySQLOpenConnection(); setUpTables();}
 
     private Connection connection;
     private String host, database, username, password;
@@ -74,8 +74,10 @@ public class MySQLHook {
     public void setUpTables(){
         try{
             Connection con = getConnection();
-            PreparedStatement create = con.prepareStatement("CREATE TABLE IF NOT EXISTS `mailDisabled` ( `message` TEXT NOT NULL , `sender` TEXT NOT NULL , `read` BOOLEAN NOT NULL DEFAULT FALSE , `item` TEXT NOT NULL , `itemReceived` BOOLEAN NOT NULL DEFAULT FALSE , `money` DOUBLE NOT NULL DEFAULT '0' , `moneyReceived` BOOLEAN NOT NULL DEFAULT FALSE ) ENGINE = InnoDB;");
+            PreparedStatement create = con.prepareStatement("CREATE TABLE IF NOT EXISTS `playermaildata`.`mailDisabled` ( `uuid` INT NOT NULL ) ENGINE = InnoDB;");
             create.executeUpdate();
+            PreparedStatement create2 = con.prepareStatement("CREATE TABLE IF NOT EXISTS `playermaildata`.`playerNames` ( `uuid` TEXT NOT NULL , `name` TEXT NOT NULL ) ENGINE = InnoDB;");
+            create2.executeUpdate();
         }catch (NullPointerException ex){
         }
         catch (Exception ex){

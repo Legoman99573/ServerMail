@@ -5,7 +5,7 @@ import com.tyrellplayz.servermail.ServerMail;
 public class LogMessagesUtil {
 
     public static void enableMessage(){
-        ServerMail.logger.info("<"+ServerMail.pdf.getVersion()+">");
+        ServerMail.logger.info("ServerMail <"+ServerMail.pdf.getVersion()+">");
         ServerMail.logger.info("-===================================================================-");
     }
 
@@ -31,7 +31,7 @@ public class LogMessagesUtil {
     }
 
     public static void updateMessage(String newVersion, String url) {
-        ServerMail.logger.info("<"+ServerMail.pdf.getVersion()+">");
+        ServerMail.logger.info("ServerMail <"+ServerMail.pdf.getVersion()+"> has a new update");
         ServerMail.logger.info("-===================================================================-");
         ServerMail.logger.info("New Version: "+newVersion);
         ServerMail.logger.info("Download here: "+url);

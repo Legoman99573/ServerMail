@@ -42,6 +42,19 @@ public class PlayerMailSQLData implements IPlayerData{
         try{
             Connection con = sm.mySQLHook.getConnection();
             Statement st = con.createStatement();
+
+            // Save PlayerName
+            try{
+                st.executeUpdate("DELETE FROM `playernames` WHERE uuid = "+uuid.toString());
+            }catch (SQLException ex){}
+            st.executeUpdate("INSERT INTO `playernames` (`uuid`,`name`) VALUES ('"+uuid.toString()+"','"+playerName+"');");
+
+            // Save mailDisabled
+            st.executeUpdate("DELETE FROM `maildisabled` WHERE uuid = "+uuid.toString());
+            if(mailDisabled){
+                st.executeUpdate("INSERT INTO `maildisabled` (`uuid`) VALUES ('"+uuid.toString()+"');");
+            }
+
             st.executeUpdate(String.format("DELETE FROM `%s`", uuid.toString()));
             for(Mail mail:mailList){
                 if(mail.hasItemStack()){
@@ -64,16 +77,41 @@ public class PlayerMailSQLData implements IPlayerData{
         try{
             Connection con = sm.mySQLHook.getConnection();
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(String.format("SELECT * FROM `%s`", uuid.toString()));
+
+            // Load name from database
+            ResultSet rsPlayerNames = st.executeQuery("SELECT * FROM `playerNames`");
+            boolean runLoop = true;
+            while(rsPlayerNames.next() && runLoop){
+                if(rsPlayerNames.getString("uuid").equalsIgnoreCase(uuid.toString())){
+                    if(rsPlayerNames.getString("name").equals(Bukkit.getServer().getOfflinePlayer(uuid).getName())){
+                        playerName = rsPlayerNames.getString("name");
+                    }else{
+                        playerName = Bukkit.getServer().getOfflinePlayer(uuid).getName();
+                    }
+                    runLoop = false;
+                }
+            }
+            // Load disabledMail from database
+            mailDisabled = false;
+            ResultSet rsMailDisabled = st.executeQuery("SELECT * FROM `playerNames`");
+            boolean runLoop2 = true;
+            while(rsMailDisabled.next() && runLoop2){
+                if(rsMailDisabled.getString("uuid").equalsIgnoreCase(uuid.toString())){
+                    mailDisabled = true;
+                    runLoop2 = false;
+                }
+            }
+            // Load mail from database
+            ResultSet rsMail = st.executeQuery(String.format("SELECT * FROM `%s`", uuid.toString()));
             List<Mail> mail = new ArrayList<>();
-            while (rs.next()) {
-                String message = rs.getString("message");
-                String sender = rs.getString("sender");
-                Boolean read = rs.getBoolean("read");
-                String item = rs.getString("item");
-                Boolean itemReceived = rs.getBoolean("itemReceived");
-                Double money = rs.getDouble("money");
-                Boolean moneyReceived = rs.getBoolean("moneyReceived");
+            while (rsMail.next()) {
+                String message = rsMail.getString("message");
+                String sender = rsMail.getString("sender");
+                Boolean read = rsMail.getBoolean("read");
+                String item = rsMail.getString("item");
+                Boolean itemReceived = rsMail.getBoolean("itemReceived");
+                Double money = rsMail.getDouble("money");
+                Boolean moneyReceived = rsMail.getBoolean("moneyReceived");
                 if(!item.isEmpty()){
                     try{
                         ItemStack itemStack = Utils.stringToItemStack(item);
