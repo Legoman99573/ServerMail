@@ -34,10 +34,10 @@ public class PlayerMailSQLMap implements IPlayerDataMap{
             DatabaseMetaData md = con.getMetaData();
             ResultSet rs = md.getTables(null, null, "%", null);
             while (rs.next()){
-                if(rs.getString(3).equalsIgnoreCase("maildisabled")){
+                if(rs.getString(3).equalsIgnoreCase("mailDisabled")){
                     continue;
                 }else
-                if(rs.getString(3).equalsIgnoreCase("playernames")){
+                if(rs.getString(3).equalsIgnoreCase("playerNames")){
                     continue;
                 }else{
                     addPlayerMail(UUID.fromString(rs.getString(3)));
