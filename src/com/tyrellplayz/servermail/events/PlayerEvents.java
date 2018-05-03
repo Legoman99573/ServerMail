@@ -38,6 +38,7 @@ public class PlayerEvents implements Listener{
             sm.getServer().getScheduler().runTaskAsynchronously(sm, () -> sm.playerMailMap.addPlayerMail(player.getUniqueId()));
         }
         // Checks if the name in the players data file is the same as the players name
+        try
         if(!sm.playerMailMap.get(player.getUniqueId()).getPlayerName().equals(player.getName())){
             // Changes the players name in config to the updated one
             sm.playerMailMap.get(player.getUniqueId()).setPlayerName(player.getName());
