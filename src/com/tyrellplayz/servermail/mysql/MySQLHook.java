@@ -78,9 +78,9 @@ public class MySQLHook {
     public void setUpTables(){
         try{
             Connection con = getConnection();
-            PreparedStatement create = con.prepareStatement("CREATE TABLE IF NOT EXISTS `playermaildata`.`mailDisabled` ( `uuid` INT NOT NULL ) ENGINE = InnoDB;");
+            PreparedStatement create = con.prepareStatement("CREATE TABLE IF NOT EXISTS `mailDisabled` ( `uuid` INT NOT NULL ) ENGINE = InnoDB;");
             create.executeUpdate();
-            PreparedStatement create2 = con.prepareStatement("CREATE TABLE IF NOT EXISTS `playermaildata`.`playerNames` ( `uuid` TEXT NOT NULL , `name` TEXT NOT NULL ) ENGINE = InnoDB;");
+            PreparedStatement create2 = con.prepareStatement("CREATE TABLE IF NOT EXISTS `playerNames` ( `uuid` TEXT NOT NULL , `name` TEXT NOT NULL ) ENGINE = InnoDB;");
             create2.executeUpdate();
         }catch (NullPointerException ex){
         }
