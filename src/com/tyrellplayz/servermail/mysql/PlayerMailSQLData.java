@@ -45,14 +45,16 @@ public class PlayerMailSQLData implements IPlayerData{
 
             // Save PlayerName
             try{
-                st.executeUpdate("DELETE FROM `playernames` WHERE uuid = "+uuid.toString());
-            }catch (SQLException ex){}
-            st.executeUpdate("INSERT INTO `playernames` (`uuid`,`name`) VALUES ('"+uuid.toString()+"','"+playerName+"');");
+                st.executeUpdate("DELETE FROM `playerNames` WHERE uuid = "+uuid.toString());
+            }catch (SQLException ex){
+                LogMessagesUtil.warningMessage("Failed to load player data for " + Bukkit.getServer().getOfflinePlayer(uuid).getName(), "Player SQL Data", "User has never been generated before. Adding it in " + uuid.toString() + " :)");
+            }
+            st.executeUpdate("INSERT INTO `playerNames` (`uuid`,`name`) VALUES ('"+uuid.toString()+"','" + Bukkit.getServer().getOfflinePlayer(uuid).getName() + "');");
 
             // Save mailDisabled
-            st.executeUpdate("DELETE FROM `maildisabled` WHERE uuid = "+uuid.toString());
+            st.executeUpdate("DELETE FROM `mailDisabled` WHERE uuid = "+uuid.toString());
             if(mailDisabled){
-                st.executeUpdate("INSERT INTO `maildisabled` (`uuid`) VALUES ('"+uuid.toString()+"');");
+                st.executeUpdate("INSERT INTO `mailDisabled` (`uuid`) VALUES ('"+uuid.toString()+"');");
             }
 
             st.executeUpdate(String.format("DELETE FROM `%s`", uuid.toString()));
