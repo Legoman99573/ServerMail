@@ -2,6 +2,7 @@ package com.tyrellplayz.servermail.mysql;
 
 import com.tyrellplayz.servermail.ServerMail;
 import com.tyrellplayz.servermail.configs.MainConfig;
+import com.tyrellplayz.servermail.utils.LogMessagesUtil;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -45,10 +46,12 @@ public class MySQLHook {
                 connection = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/"+database, username, password);
                 sm.getLogger().info("Connected to MySQL database");
             }
-        }catch (SQLException ex){
+        } catch (SQLException ex) {
+            LogMessagesUtil.errorMessage("Failed to connect to mysql database on host: " + host, "MySQL Error", "Incorrect MySQL connection information");
             ex.printStackTrace();
             sm.getPluginLoader().disablePlugin(sm);
-        }catch (ClassNotFoundException ex){
+        } catch (ClassNotFoundException ex) {
+            LogMessagesUtil.errorMessage("Class not found: com.mysql.jdbc.Driver", "MySQL Driver Missing", "Check to make sure you have the driver");
             ex.printStackTrace();
             sm.getPluginLoader().disablePlugin(sm);
         }
@@ -58,14 +61,15 @@ public class MySQLHook {
      * Closes the connection to the database
      */
     public void mySQLCloseConnection(){
-        try{
+        try {
             synchronized (this){
                 if(connection != null && !connection.isClosed()){
                     connection.close();
                     sm.getLogger().info("Connection to MySQL database closed");
                 }
             }
-        }catch (SQLException ex){
+        } catch (SQLException ex) {
+            LogMessagesUtil.errorMessage("Failed to close connection to host: " + host, "MySQL Error", "No need to close a connection if there isnt one.");
             ex.printStackTrace();
             sm.getPluginLoader().disablePlugin(sm);
         }
